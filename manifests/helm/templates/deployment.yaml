@@ -44,7 +44,7 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: {{ include "app.fullname" . }}
-                    key: {{ valueFrom.secretKeyRef.key }}
+                    key: {{ .key }}
           {{- end }}
           ports:
             - name: http

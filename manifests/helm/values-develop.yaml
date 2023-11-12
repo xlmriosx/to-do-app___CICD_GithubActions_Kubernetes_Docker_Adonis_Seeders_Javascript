@@ -23,7 +23,7 @@ env:
   CACHE_VIEWS: false
 
 secrets:
-  - name: "APP_KEY"
+  - name: APP_KEY
     key: APP_KEY
 
 imagePullSecrets: ""
