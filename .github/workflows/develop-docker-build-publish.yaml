@@ -55,3 +55,30 @@ jobs:
           cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }}
           # Pushing image to repository
           docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }}
+
+  helm:
+    runs-on: ubuntu-latest
+    steps:
+    # Get the name of each branch where running
+    - name: "Getting name of branch 🌿"
+      id: vars
+      run: echo ::set-output name=branch::${GITHUB_REF#refs/*/} # ${{ steps.vars.outputs.branch }}
+
+    # Conencting to srv and running helm commands to initialize or upgrade charts
+    - name: "Managing cycle of life of Helm Charts 🔱"
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SRV_IP_TWISTORGAR }}
+        username: ${{ secrets.SRV_USER_TWISTORGAR }}
+        password: ${{ secrets.SRV_PASSWORD_TWISTORGAR }}
+        port: ${{ secrets.SRV_PORT_TWISTORGAR }}
+        script: |
+          if [ ! -d "${{ github.event.repository.name }}" ]; then
+            git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
+          else
+            cd ${{ github.event.repository.name }}/manifests/helm && \
+            git pull
+          fi
+          cd ${{ github.event.repository.name }}/manifests/secrets && kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops
+          cd ${{ github.event.repository.name }}/manifests/helm && \
+          sudo helm upgrade --install ${{ env.SERVICE }} . -n devops -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace
