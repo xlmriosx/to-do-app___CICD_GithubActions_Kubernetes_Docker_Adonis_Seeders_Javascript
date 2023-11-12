@@ -77,8 +77,10 @@ jobs:
           if [ ! -d "${{ github.event.repository.name }}" ]; then
             git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
           else
-            cd ${{ github.event.repository.name }} && git pull
+            cd /home/twist/${{ github.event.repository.name }} && git pull
           fi
-          cd ${{ github.event.repository.name }}/manifests/secrets && kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops
-          cd ${{ github.event.repository.name }}/manifests/helm && \
+          pwd
+          cd /home/twist/${{ github.event.repository.name }}/manifests/secrets && kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops
+          pwd
+          cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
           sudo helm upgrade --install ${{ env.SERVICE }} . -n devops -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace
