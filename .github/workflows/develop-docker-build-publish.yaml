@@ -16,7 +16,7 @@ env:
   SERVER: docker.io
   USER: twistorgar
   IMAGE: devops-app
-  VERSION: 1.0.0
+  VERSION: 1.0.1
   SERVICE: devops-app
 
 jobs:
