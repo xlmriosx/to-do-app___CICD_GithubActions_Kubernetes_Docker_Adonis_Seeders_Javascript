@@ -1,0 +1,57 @@
+name: Docker-build-publish
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+on:
+  push:
+    branches: [ "develop" ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ "develop" ]
+env:
+  SERVER: docker.io
+  USER: twistorgar
+  IMAGE: devops-app
+  VERSION: 1.0.0
+  SERVICE: recommendation
+
+jobs:
+  build-push-image:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Docker hub repository login 💠"
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: "Getting name of branch 🌿"
+        id: BRANCH
+        run: echo ::set-output name=BRANCH::${GITHUB_REF#refs/*/} # ${{ steps.branch.outputs.BRANCH }}
+
+      - name: "Set name of app 🐱‍🚀"
+        id: NAME_APP
+        run: |
+          # Determine name of app based in pom.xml
+          echo ::set-output name=NAME_APP::$(grep -oPm1 "(?<=<artifactId>)[^<]+" <<< $(cat pom.xml))
+
+      - name: "Set version of app 🆚"
+        id: VERSION_APP
+        run: |
+          # Determine version of app based in pom.xml
+          echo ::set-output name=VERSION_APP::${{ env.VERSION }}
+
+      - name: "Compose Customized Docker Image and push it 🐳"
+        shell: bash
+        run: |
+          # Building image with binaries
+          cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }}
+          # Pushing image to repository
+          docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }}

@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: docker.io/twistorgar
-  name: adonis-app
+  name: devops-app
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.0.0"
@@ -14,10 +14,23 @@ image:
   livenessProbe: /
   readinessProbe: /
 
+env:
+  PORT: 3333
+  HOST: 0.0.0.0
+  NODE_ENV: development
+  DRIVE_DISK: local
+  SESSION_DRIVER: cookie
+  CACHE_VIEWS: false
+
+secrets:
+  - name: "APP_KEY"
+    key: APP_KEY
+  - name: "PASS"
+    key: pass
 
 imagePullSecrets: ""
-nameOverride: "app"
-fullnameOverride: "app"
+nameOverride: "devops-app"
+fullnameOverride: "devops-app"
 
 serviceAccount:
   # Specifies whether a service account should be created
