@@ -77,8 +77,7 @@ jobs:
           if [ ! -d "${{ github.event.repository.name }}" ]; then
             git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
           else
-            cd ${{ github.event.repository.name }}/manifests/helm && \
-            git pull
+            cd ${{ github.event.repository.name }} && git pull
           fi
           cd ${{ github.event.repository.name }}/manifests/secrets && kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops
           cd ${{ github.event.repository.name }}/manifests/helm && \
