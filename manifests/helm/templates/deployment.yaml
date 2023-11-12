@@ -43,7 +43,7 @@ spec:
               - name: {{ .name }}
                 valueFrom:
                   secretKeyRef:
-                    name: {{ include "app.fullname" . }}
+                    name: devops-app
                     key: {{ .key }}
           {{- end }}
           ports:
