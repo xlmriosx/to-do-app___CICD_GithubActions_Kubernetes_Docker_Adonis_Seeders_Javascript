@@ -40,11 +40,11 @@ spec:
               value: {{ $val | quote }}
           {{- end }}
           {{- range .Values.secrets }}
-              - name: {{ .name }}
-                valueFrom:
-                  secretKeyRef:
-                    name: devops-app
-                    key: {{ .key }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: devops-app
+                  key: {{ .key }}
           {{- end }}
           ports:
             - name: http
