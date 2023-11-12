@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 # Install app dependencies
-RUN sudo npm install npm -g -y && npm install -y
+RUN npm install npm -g -y && npm install -y
 # Copy the rest of the application code to the working directory
 COPY . .
 # Expose the port that the app will run on
