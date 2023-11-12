@@ -20,6 +20,6 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/devops-app', async ({ view }) => {
+Route.get('/', async ({ view }) => {
   return view.render('welcome')
 })
