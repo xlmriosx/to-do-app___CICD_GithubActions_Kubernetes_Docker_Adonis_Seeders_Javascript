@@ -48,7 +48,7 @@ spec:
       volumes:
       - name: mysql-persistent-storage
         hostPath:
-          path: /home/devops/mysql
+          path: /home/twist/mysql
           type: Directory
 
 # kubectl run -n mysql -it --rm --image=mysql:8 --restart=Never mysql-client -- mysql -hmysql -uelon -pmusk
