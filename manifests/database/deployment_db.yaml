@@ -2,13 +2,12 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: devops
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-  namespace: mysql
+  namespace: devops
 spec:
   selector:
     matchLabels:
@@ -56,18 +55,5 @@ spec:
         hostPath:
           path: /home/elon/mysql
           type: Directory
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mysql-root-password
-  namespace: mysql
-type: Opaque
-data:
-  MYSQL_ROOT_PASSWORD: ZGV2b3BzMjAyMA==
-  MYSQL_DATABASE: ZGV2b3Bz
-  MYSQL_USER: ZWxvbg==
-  MYSQL_PASSWORD: bXVzaw==
-
 
 # kubectl run -n mysql -it --rm --image=mysql:8 --restart=Never mysql-client -- mysql -hmysql -uelon -pmusk
