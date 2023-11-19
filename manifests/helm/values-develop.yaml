@@ -21,8 +21,8 @@ env:
   DRIVE_DISK: local
   SESSION_DRIVER: cookie
   DB_CONNECTION: mysql
-  MYSQL_HOST: mysql.devops.svc.cluster.local # 127.0.0.1
-  MYSQL_PORT: 3306
+  MYSQL_HOST: 149.50.132.241 # mysql.devops.svc.cluster.local # 127.0.0.1
+  MYSQL_PORT: 30306 #3306
   MYSQL_USER: elon
   MYSQL_PASSWORD: musk
   MYSQL_DB_NAME: devops
