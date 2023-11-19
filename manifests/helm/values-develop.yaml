@@ -11,8 +11,8 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.0.1"
   containerPort: 3333
-  livenessProbe: /
-  readinessProbe: /
+  livenessProbe: /health-check
+  readinessProbe: /health-check
 
 env:
   PORT: 3333
@@ -20,7 +20,12 @@ env:
   NODE_ENV: development
   DRIVE_DISK: local
   SESSION_DRIVER: cookie
-  CACHE_VIEWS: false
+  DB_CONNECTION: mysql
+  MYSQL_HOST: 127.0.0.1
+  MYSQL_PORT: 3306
+  MYSQL_USER: elon
+  MYSQL_PASSWORD: musk
+  MYSQL_DB_NAME: devops
 
 secrets:
   - name: APP_KEY

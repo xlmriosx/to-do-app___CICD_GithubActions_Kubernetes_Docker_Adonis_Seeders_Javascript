@@ -14,12 +14,26 @@
 | and then import them inside `start/routes.ts` as follows
 |
 | import './routes/cart'
-| import './routes/customer''
+| import './routes/customer'
 |
 */
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async ({ view }) => {
-  return view.render('welcome')
+Route.get('/health-check', async () => {
+  return { status: 'ok' }
 })
+
+Route.group(() => {
+
+  Route.post("register", "AuthController.register");
+  Route.post("login", "AuthController.login");
+  
+  Route.group(() => {
+    Route.get("todos", "TodosController.index");
+    Route.get("todos/:id", "TodosController.show");
+    Route.put("todos/update", "TodosController.update");
+    Route.post("todos", "TodosController.store");
+  }).middleware("auth:api");
+      
+}).prefix("api");

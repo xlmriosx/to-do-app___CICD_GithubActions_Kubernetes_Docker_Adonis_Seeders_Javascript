@@ -11,7 +11,7 @@ COPY . .
 # Expose the port that the app will run on
 # EXPOSE 3333
 # Start the Adonis.js application
-CMD ["node", "ace", "serve", "--watch"]
+CMD ["node", "ace", "serve"]
 ##################################
 # ARG NODE_IMAGE=node:16.13.1-alpine
 
