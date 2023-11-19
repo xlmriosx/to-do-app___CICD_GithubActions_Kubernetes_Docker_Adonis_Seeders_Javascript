@@ -10,8 +10,6 @@ RUN npm install npm -g -y && npm install -y
 COPY . .
 # Expose the port that the app will run on
 # EXPOSE 3333
-# Apply migrations
-RUN node ace migration:run
 # Start the Adonis.js application
 CMD ["node", "ace", "serve"]
 ##################################

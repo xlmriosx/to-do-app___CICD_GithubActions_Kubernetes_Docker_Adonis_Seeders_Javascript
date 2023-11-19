@@ -79,6 +79,7 @@ jobs:
           else
             cd /home/twist/${{ github.event.repository.name }} && git pull
           fi
+          kubectl run -n devops --rm --image=${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }} --restart=Never migrate-client -- node ace migration:run
           cd /home/twist/${{ github.event.repository.name }}/manifests/secrets && sudo kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops
           cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
           sudo helm upgrade --install ${{ env.SERVICE }} . -n devops -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace
