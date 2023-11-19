@@ -14,22 +14,44 @@ image:
   livenessProbe: /health-check
   readinessProbe: /health-check
 
-env:
-  PORT: 3333
-  HOST: 0.0.0.0 # devops-app.devops.svc.cluster.local
+configValues:
+  HOST: 0.0.0.0
+  PORT: 30306
   NODE_ENV: development
   DRIVE_DISK: local
   SESSION_DRIVER: cookie
   DB_CONNECTION: mysql
-  MYSQL_HOST: 149.50.132.241 # mysql.devops.svc.cluster.local # 127.0.0.1
-  MYSQL_PORT: 30306 #3306
-  MYSQL_USER: elon
-  MYSQL_PASSWORD: musk
+  MYSQL_HOST: 149.50.132.241
+  MYSQL_PORT: 30306
   MYSQL_DB_NAME: devops
+
+configs:
+  - name: HOST
+    key: HOST # HOST: 0.0.0.0 # devops-app.devops.svc.cluster.local
+  - name: PORT
+    key: PORT # PORT: 3333
+  - name: NODE_ENV
+    key: NODE_ENV # NODE_ENV: development
+  - name: DRIVE_DISK
+    key: DRIVE_DISK # DRIVE_DISK: local
+  - name: SESSION_DRIVER
+    key: SESSION_DRIVER # SESSION_DRIVER: cookie
+  - name: DB_CONNECTION
+    key: DB_CONNECTION # DB_CONNECTION: mysql
+  - name: MYSQL_HOST
+    key: MYSQL_HOST # MYSQL_HOST: 149.50.132.241 # mysql.devops.svc.cluster.local # 127.0.0.1
+  - name: MYSQL_PORT
+    key: MYSQL_PORT # MYSQL_PORT: 30306 #3306
+  - name: MYSQL_DB_NAME
+    key: MYSQL_DB_NAME # MYSQL_DB_NAME: devops
 
 secrets:
   - name: APP_KEY
     key: APP_KEY
+  - name: MYSQL_USER
+    key: MYSQL_USER
+  - name: MYSQL_PASSWORD
+    key: MYSQL_PASSWORD
 
 imagePullSecrets: ""
 nameOverride: "devops-app"

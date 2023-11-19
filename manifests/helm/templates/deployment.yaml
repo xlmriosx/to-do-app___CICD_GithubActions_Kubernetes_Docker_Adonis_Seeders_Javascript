@@ -35,9 +35,12 @@ spec:
           image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:          
-          {{- range $key, $val := .Values.env }}
-            - name: {{ $key }}
-              value: {{ $val | quote }}
+          {{- range .Values.configs }}
+            - name: {{ .name }}
+              valueFrom:
+                configMapKeyRef:
+                  name: devops-app
+                  key: {{ .key }}
           {{- end }}
           {{- range .Values.secrets }}
             - name: {{ .name }}
