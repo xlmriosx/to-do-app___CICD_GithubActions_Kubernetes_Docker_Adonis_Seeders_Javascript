@@ -1,19 +1,22 @@
-import BaseSchema from "@ioc:Adonis/Lucid/Schema";
+import BaseSchema from "@ioc:Adonis/Lucid/Schema"
 
 export default class Todos extends BaseSchema {
-	protected tableName = "todos";
-    
+	protected tableName = "todos"
+
 	public async up() {
         this.schema.createTable(this.tableName, (table) => {
-            table.increments("id");
-            table.string("title", 255).notNullable();
-            table.string("desc", 255).notNullable();
-            table.boolean("done").default(false);
-            table.timestamps(true);
-		});
+            table.increments("id")
+            table.string("title").notNullable()
+            table.string("desc").notNullable()
+            table.boolean("done").nullable()
+            table.timestamps(true)
+
+            table.timestamp('created_at', { useTz: true })
+            table.timestamp('updated_at', { useTz: true })
+		})
 	}
-    
+
 	public async down() {
-		this.schema.dropTable(this.tableName);
+		this.schema.dropTable(this.tableName)
 	}
 }
