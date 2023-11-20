@@ -109,6 +109,9 @@ jobs:
         password: ${{ secrets.SRV_PASSWORD_TWISTORGAR }}
         port: ${{ secrets.SRV_PORT_TWISTORGAR }}
         script: |
-          cd /home/twist/${{ github.event.repository.name }}/manifests/secrets && sudo kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops
+          cd /home/twist/${{ github.event.repository.name }}/manifests/vars  && \
+          sudo kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops && \
+          sudo kubectl apply -f configmap-${{ steps.vars.outputs.branch }}.yaml -n devops
+
           cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
           sudo helm upgrade --install ${{ env.SERVICE }} . -n devops -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace
