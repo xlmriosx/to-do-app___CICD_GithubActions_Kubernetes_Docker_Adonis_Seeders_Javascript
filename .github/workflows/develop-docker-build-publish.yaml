@@ -61,7 +61,7 @@ jobs:
       run: |
         # Running new image
         docker run --rm \
-        -e "HOST=${{ env.develop_HOST }}" \
+        -e "HOST=${{ env.HOST }}" \
         -e "PORT=${{ env.develop_PORT }}" \
         -e "NODE_ENV=${{ env.develop_NODE_ENV }}" \
         -e "APP_KEY=${{ secrets.develop_APP_KEY }}" \
