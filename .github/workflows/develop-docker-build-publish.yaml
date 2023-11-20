@@ -52,7 +52,14 @@ jobs:
           cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
           # Pushing image to repository
           docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
-
+      
+      - name: "Notify status of failure job"
+        if: ${{ failure() }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          ${{ secrets.TEAMS_WEBHOOK_URL }}
+      
   migration:
     runs-on: ubuntu-latest
     needs: [build-push-image]
@@ -75,6 +82,13 @@ jobs:
         -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
         ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
         node ace migration:run
+    
+    - name: "Notify status of failure job"
+      if: ${{ failure() }}
+      run: |
+        curl -X POST -H "Content-Type: application/json" \
+        -d '{"content": "Something in migration was wrong! \nStatus: 🦅`${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+        ${{ secrets.TEAMS_WEBHOOK_URL }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -115,3 +129,23 @@ jobs:
 
           cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
           sudo helm upgrade --install ${{ env.SERVICE }} . -n devops -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace
+
+    - name: "Notify status of failure job"
+      if: ${{ failure() }}
+      run: |
+        curl -X POST -H "Content-Type: application/json" \
+        -d '{"content": "Something in deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was wrong! 🚀\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+        ${{ secrets.TEAMS_WEBHOOK_URL }}
+
+  notification:
+    runs-on: ubuntu-latest
+    needs: [build-push-image, migration, deploy]
+    steps:
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          TARGET_BRANCH: develop
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "Build and deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was succesfully! 🐳🚀\nStatus: `${{ job.status }}` 🍻✅ \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          ${{ secrets.TEAMS_WEBHOOK_URL }}
