@@ -15,15 +15,15 @@ image:
   readinessProbe: /health-check
 
 configValues:
-  HOST: "0.0.0.0"
-  PORT: "30306"
-  NODE_ENV: "development"
-  DRIVE_DISK: "local"
-  SESSION_DRIVER: "cookie"
-  DB_CONNECTION: "mysql"
-  MYSQL_HOST: "149.50.132.241"
-  MYSQL_PORT: "30306"
-  MYSQL_DB_NAME: "devops"
+  HOST: '0.0.0.0'
+  PORT: '30306'
+  NODE_ENV: 'development'
+  DRIVE_DISK: 'local'
+  SESSION_DRIVER: 'cookie'
+  DB_CONNECTION: 'mysql'
+  MYSQL_HOST: '149.50.132.241'
+  MYSQL_PORT: '30306'
+  MYSQL_DB_NAME: 'devops'
 
 configs:
   - name: HOST
