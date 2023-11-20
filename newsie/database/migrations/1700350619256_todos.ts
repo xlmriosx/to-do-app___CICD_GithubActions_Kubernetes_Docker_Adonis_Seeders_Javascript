@@ -9,7 +9,6 @@ export default class Todos extends BaseSchema {
             table.string("title").notNullable()
             table.string("desc").notNullable()
             table.boolean("done").nullable()
-            table.timestamps(true)
 
             table.timestamp('created_at', { useTz: true })
             table.timestamp('updated_at', { useTz: true })
