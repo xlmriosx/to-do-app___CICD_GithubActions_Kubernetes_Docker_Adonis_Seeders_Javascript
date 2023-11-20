@@ -73,7 +73,7 @@ jobs:
         -e "MYSQL_PASSWORD=${{ secrets.develop_MYSQL_PASSWORD }}" \
         -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
         ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
-        /bin/bash node ace migration:run
+        node ace migration:run
 
   deploy:
     runs-on: ubuntu-latest
