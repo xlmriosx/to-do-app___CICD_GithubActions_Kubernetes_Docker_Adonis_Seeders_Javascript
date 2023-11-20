@@ -60,7 +60,7 @@ jobs:
     steps:
     # - name: "Applying migrations with new image 🦅"
     #   shell: bash
-    - run: echo "Hola"
+      - run: echo "Hola"
 # # Running new image
 # docker run --rm \
 # -e HOST="${{ env.develop_HOST }}" \
