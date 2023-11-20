@@ -20,7 +20,6 @@ env:
   SERVICE: devops-app
   HOST: 0.0.0.0
   DB_CONNECTION: mysql
-  TEAMS_WEBHOOK_URL: https://frreutn.webhook.office.com/webhookb2/ea2b5351-85e5-456f-9b34-a0db384bae7a@35e9cd03-43d0-4947-b582-a6965c4cb674/IncomingWebhook/b00c42e30b27416489378aac31d2876d/be004b0f-abfb-4496-a00d-42f8968bb254
   # Specific values
   develop_PORT: 30306 
   develop_NODE_ENV: development
@@ -147,3 +146,16 @@ jobs:
         curl -X POST -H "Content-Type: application/json" \
         -d '{"content": "Build and deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was succesfully! 🐳🚀\nStatus: `${{ job.status }}` 🍻✅ \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
         ${{ env.TEAMS_WEBHOOK_URL }}
+
+  notification:
+    runs-on: ubuntu-latest
+    needs: [build-push-image, migration, deploy]
+    steps:
+      - name: Notify Teams
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          TARGET_BRANCH: develop
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "Build and deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was succesfully! 🐳🚀\nStatus: `${{ job.status }}` 🍻✅ \nAutor: @${{ github.actor }}"}' \
+          ${{ secrets.TEAMS_WEBHOOK_URL }}
