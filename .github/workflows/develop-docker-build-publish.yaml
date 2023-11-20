@@ -29,33 +29,33 @@ env:
   develop_MYSQL_DB_NAME: devops
 
 jobs:
-  # build-push-image:
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/develop'
-  #   steps:
-  #     - uses: actions/checkout@v3
+  build-push-image:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: "Docker hub repository login 💠"
-  #       uses: docker/login-action@v2
-  #       with:
-  #         username: ${{ secrets.DOCKER_USERNAME }}
-  #         password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: "Docker hub repository login 💠"
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
       
-  #     - name: "Getting name of branch 🌿"
-  #       id: BRANCH
-  #       run: echo ::set-output name=BRANCH::${GITHUB_REF#refs/*/} # ${{ steps.branch.outputs.BRANCH }}
+      - name: "Getting name of branch 🌿"
+        id: BRANCH
+        run: echo ::set-output name=BRANCH::${GITHUB_REF#refs/*/} # ${{ steps.branch.outputs.BRANCH }}
 
-  #     - name: "Compose Customized Docker Image and push it 🐳"
-  #       shell: bash
-  #       run: |
-  #         # Building image with binaries
-  #         cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
-  #         # Pushing image to repository
-  #         docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
+      - name: "Compose Customized Docker Image and push it 🐳"
+        shell: bash
+        run: |
+          # Building image with binaries
+          cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
+          # Pushing image to repository
+          docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
 
   migration:
     runs-on: ubuntu-latest
-    # needs: [build-push-image]
+    needs: [build-push-image]
     steps:
     - name: "Applying migrations with new image 🦅"
       shell: bash
