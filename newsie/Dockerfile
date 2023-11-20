@@ -1,37 +1,31 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
-# Set the working directory in the container
+ARG NODE_VERSION=18
+FROM node:${NODE_VERSION}-alpine as builder
+
+# Create app directory
+RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-# Install app dependencies
-RUN npm install npm -g -y && npm install -y
-# Copy the rest of the application code to the working directory
-COPY . .
-# Expose the port that the app will run on
-# EXPOSE 3333
-# Start the Adonis.js application
-CMD ["node", "ace", "serve"]
-##################################
-# ARG NODE_IMAGE=node:16.13.1-alpine
 
-# FROM $NODE_IMAGE AS base
-# RUN apk --no-cache add dumb-init
-# RUN mkdir -p /home/node/app && chown node:node /home/node/app
-# WORKDIR /home/node/app
-# USER node
-# RUN mkdir tmp
+# Installing dependencies
+COPY . /usr/src/app/
+RUN npm install
 
-# FROM base AS dependencies
-# COPY --chown=node:node ./package*.json ./
-# RUN npm ci
-# COPY --chown=node:node . .
+# -----------------------------------------------------------------------------------#
 
-# FROM dependencies AS build
-# RUN node ace build --production
+FROM alpine as app
 
-# FROM base AS production
-# COPY --chown=node:node ./package*.json ./
-# RUN npm ci --production
-# COPY --chown=node:node --from=build /home/node/app/build .
-# CMD [ "dumb-init", "node", "server.ts" ]
+RUN addgroup -S node && adduser -S node -G node -G adm
+
+COPY --chown=node:node --from=builder /usr/src/app /usr/src/app
+
+COPY --from=builder /usr/lib /usr/lib
+COPY --from=builder /usr/local/share /usr/local/share
+COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/local/include /usr/local/include
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+WORKDIR /usr/src/app
+
+# Tell docker that all future commands should run as the node user
+USER node
+
+CMD ["npm", "run", "dev"]
