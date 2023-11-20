@@ -67,25 +67,27 @@ jobs:
   migration:
     runs-on: ubuntu-latest
     needs: [build-push-image]
+    container: 
+      image: ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }}
     steps:
     - name: "Applying migrations with new image 🦅"
       shell: bash
-      run: |
-        # Running new image
-        docker run --rm \
-        -e HOST="${{ env.develop_HOST }}" \
-        -e PORT="${{ env.develop_PORT }}" \
-        -e NODE_ENV="${{ env.develop_NODE_ENV }}" \
-        -e APP_KEY="${{ secrets.develop_APP_KEY }}" \
-        -e DRIVE_DISK="${{ env.develop_DRIVE_DISK }}" \
-        -e DB_CONNECTION="${{ env.DB_CONNECTION }}" \
-        -e MYSQL_HOST="${{ env.develop_MYSQL_HOST }}" \
-        -e MYSQL_PORT="${{ env.develop_MYSQL_PORT }}" \
-        -e MYSQL_USER="${{ secrets.develop_MYSQL_USER }}" \
-        -e MYSQL_PASSWORD="${{ secrets.develop_MYSQL_PASSWORD }}" \
-        -e MYSQL_DB_NAME="${{ env.develop_MYSQL_DB_NAME }}" \
-        ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }} \
-        /bin/bash node ace migration:run
+      run: echo "Hola"
+# # Running new image
+# docker run --rm \
+# -e HOST="${{ env.develop_HOST }}" \
+# -e PORT="${{ env.develop_PORT }}" \
+# -e NODE_ENV="${{ env.develop_NODE_ENV }}" \
+# -e APP_KEY="${{ secrets.develop_APP_KEY }}" \
+# -e DRIVE_DISK="${{ env.develop_DRIVE_DISK }}" \
+# -e DB_CONNECTION="${{ env.DB_CONNECTION }}" \
+# -e MYSQL_HOST="${{ env.develop_MYSQL_HOST }}" \
+# -e MYSQL_PORT="${{ env.develop_MYSQL_PORT }}" \
+# -e MYSQL_USER="${{ secrets.develop_MYSQL_USER }}" \
+# -e MYSQL_PASSWORD="${{ secrets.develop_MYSQL_PASSWORD }}" \
+# -e MYSQL_DB_NAME="${{ env.develop_MYSQL_DB_NAME }}" \
+#  \
+# /bin/bash node ace migration:run
 
   deploy:
     runs-on: ubuntu-latest
