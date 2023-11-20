@@ -18,6 +18,14 @@ env:
   IMAGE: devops-app
   VERSION: 1.0.1
   SERVICE: devops-app
+  HOST: 0.0.0.0
+  develop_PORT: 30306 
+  develop_NODE_ENV: development
+  develop_DRIVE_DISK: local
+  develop_DB_CONNECTION: mysql
+  develop_MYSQL_HOST: 149.50.132.241
+  develop_MYSQL_PORT: 30306
+  develop_MYSQL_DB_NAME: devops
 
 jobs:
   build-push-image:
@@ -56,17 +64,40 @@ jobs:
           # Pushing image to repository
           docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }}
 
-  helm:
+  migration:
     runs-on: ubuntu-latest
     needs: [build-push-image]
+    steps:
+    - name: "Applying migrations with new image 🦅"
+        shell: bash
+        run: |
+          # Running new image
+          docker run \
+          -e="HOST=${{ env.develop_HOST }}" \
+          -e="PORT=${{ env.develop_PORT }}" \
+          -e="NODE_ENV=${{ env.develop_NODE_ENV }}" \
+          -e="APP_KEY=${{ secrets.develop_APP_KEY }}" \
+          -e="DRIVE_DISK=${{ env.develop_DRIVE_DISK }}" \
+          -e="DB_CONNECTION=${{ env.DB_CONNECTION }}" \
+          -e="MYSQL_HOST=${{ env.develop_MYSQL_HOST }}" \
+          -e="MYSQL_PORT=${{ env.develop_MYSQL_PORT }}" \
+          -e="MYSQL_USER=${{ secrets.develop_MYSQL_USER }}" \
+          -e="MYSQL_PASSWORD=${{ secrets.develop_MYSQL_PASSWORD }}" \
+          -e="MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
+          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ steps.VERSION_APP.outputs.VERSION_APP }} \
+          node ace migration:run
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [migrations]
     steps:
     # Get the name of each branch where running
     - name: "Getting name of branch 🌿"
       id: vars
       run: echo ::set-output name=branch::${GITHUB_REF#refs/*/} # ${{ steps.vars.outputs.branch }}
 
-    # Conencting to srv and running helm commands to initialize or upgrade charts
-    - name: "Managing cycle of life of Helm Charts 🔱"
+    # Conencting to srv and updating Helm chart
+    - name: "Updating files charts of Helm 🔱"
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.SRV_IP_TWISTORGAR }}
@@ -79,6 +110,16 @@ jobs:
           else
             cd /home/twist/${{ github.event.repository.name }} && git pull
           fi
+
+    # Conencting to srv and running helm commands to initialize or upgrade charts
+    - name: "Updating Helm App 🚀"
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SRV_IP_TWISTORGAR }}
+        username: ${{ secrets.SRV_USER_TWISTORGAR }}
+        password: ${{ secrets.SRV_PASSWORD_TWISTORGAR }}
+        port: ${{ secrets.SRV_PORT_TWISTORGAR }}
+        script: |
           cd /home/twist/${{ github.event.repository.name }}/manifests/secrets && sudo kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops
           cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
           sudo helm upgrade --install ${{ env.SERVICE }} . -n devops -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace
