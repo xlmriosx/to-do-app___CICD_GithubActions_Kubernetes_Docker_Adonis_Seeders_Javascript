@@ -55,11 +55,10 @@ jobs:
   migration:
     runs-on: ubuntu-latest
     needs: [build-push-image]
-    container: { image: ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} }
     steps:
-    # - name: "Applying migrations with new image 🦅"
-    #   shell: bash
-      - run: echo "Hola"
+    - name: "Applying migrations with new image 🦅"
+      shell: bash
+      run: docker run ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
 # # Running new image
 # docker run --rm \
 # -e HOST="${{ env.develop_HOST }}" \
