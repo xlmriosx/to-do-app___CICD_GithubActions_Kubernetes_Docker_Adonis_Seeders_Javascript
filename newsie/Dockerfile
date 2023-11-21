@@ -28,4 +28,6 @@ WORKDIR /usr/src/app
 # Tell docker that all future commands should run as the node user
 USER node
 
+ENV CACHE_DIR /home/node/app/.cache/
+
 CMD ["npm", "run", "dev"]
