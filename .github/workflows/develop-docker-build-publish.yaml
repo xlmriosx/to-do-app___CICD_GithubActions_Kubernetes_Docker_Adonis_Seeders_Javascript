@@ -80,7 +80,8 @@ jobs:
         -e "MYSQL_USER=${{ secrets.develop_MYSQL_USER }}" \
         -e "MYSQL_PASSWORD=${{ secrets.develop_MYSQL_PASSWORD }}" \
         -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
-        ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} 
+        ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
+        node ace migration:run
     
     - name: "Notify status of failure job"
       if: ${{ failure() }}
