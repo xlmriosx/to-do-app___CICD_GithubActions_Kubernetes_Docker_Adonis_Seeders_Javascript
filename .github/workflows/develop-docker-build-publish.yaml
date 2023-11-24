@@ -12,6 +12,15 @@ on:
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "develop" ]
+  workflow_dispatch:
+    inputs:
+      # Allow manual triggering of a workflow run.
+      # This is useful for testing and debugging.
+      manual_trigger:
+        description: 'Trigger a workflow seeder run manually'
+        required: false
+        default: 'false'
+
 env:
   SERVER: docker.io
   USER: twistorgar
@@ -94,7 +103,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-push-image,migration]
     steps:
+
     - name: "Applying seeder with new image 🦅"
+      if: github.event_name == 'workflow_dispatch'
       shell: bash
       run: |
         # Running new image
@@ -112,6 +123,8 @@ jobs:
         -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
         ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
         node ace db:seed
+      
+    
     
     - name: "Notify status of failure job"
       if: ${{ failure() }}
