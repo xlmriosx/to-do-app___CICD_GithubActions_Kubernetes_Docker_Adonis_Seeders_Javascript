@@ -38,6 +38,13 @@ env:
   develop_MYSQL_DB_NAME: devops
 
 jobs:
+  test:
+    runs-on: ubuntu-latest  
+    environment: qa
+    steps:
+      - name: Print Hello World
+        run: echo "esto es porque anda je"
+
   build-push-image:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
@@ -57,8 +64,8 @@ jobs:
       - name: "Compose Customized Docker Image and push it 🐳"
         shell: bash
         run: |
-          # Building image with binaries
-          cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} --no-cache
+          # Building image with binaries 
+          cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} --no-cache 
           # Pushing image to repository
           docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
       
