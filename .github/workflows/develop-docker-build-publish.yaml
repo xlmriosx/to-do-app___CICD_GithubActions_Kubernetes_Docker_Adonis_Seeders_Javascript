@@ -43,6 +43,7 @@ jobs:
     environment: qa
     steps:
       - name: Print Hello World
+        shell: bash
         run: echo "esto es porque anda je"
 
   build-push-image:
