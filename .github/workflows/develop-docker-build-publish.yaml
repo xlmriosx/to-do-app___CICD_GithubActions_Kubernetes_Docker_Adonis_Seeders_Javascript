@@ -60,7 +60,6 @@ jobs:
 
       - name: Run in container
         run: |
-          git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
           flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
 
   build-push-image:
