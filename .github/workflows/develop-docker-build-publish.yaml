@@ -106,8 +106,8 @@ jobs:
           -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
           ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
           node ace migration:run
-      - if: github.ref == 'refs/heads/qa'
-        name: "Applying migrations with new image 🦅"
+      - name: "Applying migrations with new image 🦅"
+        if: github.ref == 'refs/heads/qa'
         shell: bash
         run: |
           # Running new image
