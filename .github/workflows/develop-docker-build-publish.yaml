@@ -169,9 +169,9 @@ jobs:
       - name: Applying flyway to qa
         if: github.ref == 'refs/heads/qa'
         run: |
-          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
-          flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
-          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+          flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
 
       - name: Applying flyway to master
         if: github.ref == 'refs/heads/master'
@@ -180,9 +180,9 @@ jobs:
           flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
           flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
 
-  deploy:
+  deploy-app:
     runs-on: ubuntu-latest
-    needs: [seeder]
+    needs: [data-migration]
     steps:
     # Get the name of each branch where running
     - name: "Getting name of branch 🌿"
@@ -229,7 +229,7 @@ jobs:
 
   notification:
     runs-on: ubuntu-latest
-    needs: [deploy]
+    needs: [deploy-app]
     steps:
       - name: Notify Teams
         env:
