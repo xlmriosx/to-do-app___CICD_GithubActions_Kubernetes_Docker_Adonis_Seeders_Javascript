@@ -37,19 +37,19 @@ env:
   develop_MYSQL_PORT: 30306
   develop_MYSQL_DB_NAME: devops_develop
   # Specific values
-  develop_PORT: 30306 
-  develop_NODE_ENV: qa
-  develop_DRIVE_DISK: local
-  develop_MYSQL_HOST: 149.50.132.241
-  develop_MYSQL_PORT: 30306
-  develop_MYSQL_DB_NAME: devops_qa
+  qa_PORT: 30306 
+  qa_NODE_ENV: qa
+  qa_DRIVE_DISK: local
+  qa_MYSQL_HOST: 149.50.132.241
+  qa_MYSQL_PORT: 30306
+  qa_MYSQL_DB_NAME: devops_qa
   # Specific values
-  develop_PORT: 30306 
-  develop_NODE_ENV: master
-  develop_DRIVE_DISK: local
-  develop_MYSQL_HOST: 149.50.132.241
-  develop_MYSQL_PORT: 30306
-  develop_MYSQL_DB_NAME: devops_master
+  master_PORT: 30306 
+  master_NODE_ENV: master
+  master_DRIVE_DISK: local
+  master_MYSQL_HOST: 149.50.132.241
+  master_MYSQL_PORT: 30306
+  master_MYSQL_DB_NAME: devops_master
 
 jobs:
   build-push-image:
