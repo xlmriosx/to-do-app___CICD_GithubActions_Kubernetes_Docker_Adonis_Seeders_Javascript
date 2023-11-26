@@ -52,22 +52,36 @@ env:
   master_MYSQL_DB_NAME: devops_master
 
 jobs:
-  flyway:
+  data-migration:
     runs-on: ubuntu-latest
     container: nelsonyaccuzzi/flyway
     steps:
       - uses: actions/checkout@v3
       
-      - name: Run in container
+      - name: Applying flyway
         if: github.ref == 'refs/heads/develop'
         run: |
           flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
           flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
           flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
 
+      - name: Applying flyway
+        if: github.ref == 'refs/heads/qa'
+        run: |
+          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+          flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+
+      - name: Applying flyway
+        if: github.ref == 'refs/heads/master'
+        run: |
+          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+          flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+  
   build-push-image:
     runs-on: ubuntu-latest
-    needs: [flyway]
+    needs: [data-migration]
     if: github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v3
@@ -97,7 +111,7 @@ jobs:
           -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ env.TEAMS_WEBHOOK_URL }}
       
-  migration:
+  schema-migration:
     runs-on: ubuntu-latest
     needs: [build-push-image]
     steps:
@@ -168,7 +182,7 @@ jobs:
   
   seeder:
     runs-on: ubuntu-latest
-    needs: [build-push-image,migration]
+    needs: [schema-migration]
     steps:
     - name: "Applying seeder with new image 🦅"
       if: github.ref == 'refs/heads/develop'
