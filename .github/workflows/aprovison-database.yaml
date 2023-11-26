@@ -1,0 +1,96 @@
+name: Docker-build-publish
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+on:
+  push:
+    branches: [ "iaac" ]
+  pull_request:
+    branches: [ "iaac" ]
+  workflow_dispatch:
+    inputs:
+      # Allow manual triggering of a workflow run.
+      # This is useful for testing and debugging.
+      manual_trigger:
+        description: 'Trigger a workflow aprovision mysql manually'
+        required: false
+        default: 'false'
+
+jobs:
+  settings:
+    runs-on: ubuntu-latest
+    steps:
+    # Setting permissions
+    - name: "Setting up requirements to database 🧰"
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SRV_IP_TWISTORGAR }}
+        username: ${{ secrets.SRV_USER_TWISTORGAR }}
+        password: ${{ secrets.SRV_PASSWORD_TWISTORGAR }}
+        port: ${{ secrets.SRV_PORT_TWISTORGAR }}
+        script: |
+          mkdir /home/twist/mysql && chmod 777 /home/twist/mysql
+
+  manifests:
+    runs-on: ubuntu-latest
+    needs: [settings]
+    steps:
+    # Get the name of each branch where running
+    - name: "Getting name of branch 🌿"
+      id: vars
+      run: echo ::set-output name=branch::${GITHUB_REF#refs/*/} # ${{ steps.vars.outputs.branch }}
+
+    # Conencting to srv and updating Helm chart
+    - name: "Updating files charts of Helm 🔱"
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SRV_IP_TWISTORGAR }}
+        username: ${{ secrets.SRV_USER_TWISTORGAR }}
+        password: ${{ secrets.SRV_PASSWORD_TWISTORGAR }}
+        port: ${{ secrets.SRV_PORT_TWISTORGAR }}
+        script: |
+          if [ ! -d "${{ github.event.repository.name }}" ]; then
+            git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
+          else
+            cd /home/twist/${{ github.event.repository.name }} && git checkout ${{ steps.vars.outputs.branch }} && git pull
+          fi
+  
+  setup:
+    runs-on: ubuntu-latest
+    needs: [manifests]
+    steps:
+    # Conencting to srv and aprovision database by manifests
+    - name: "Aprovision Database 💾"
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SRV_IP_TWISTORGAR }}
+        username: ${{ secrets.SRV_USER_TWISTORGAR }}
+        password: ${{ secrets.SRV_PASSWORD_TWISTORGAR }}
+        port: ${{ secrets.SRV_PORT_TWISTORGAR }}
+        script: |
+          cd /home/twist/${{ github.event.repository.name }}/manifests/database  && \
+          sudo kubectl apply -f namespace.yaml -n mysql && \
+          sudo kubectl apply -f secret.yaml -n mysql && \
+          sudo kubectl apply -f service.yaml -n mysql && \
+          sudo kubectl apply -f deployment.yaml -n mysql
+
+          while [[ "$(kubectl get pod -l app=mysql -n mysql -o jsonpath='{.items[0].status.phase}')" != "Running" ]]; do
+            echo "Waiting for a pod associated with deployment mysql to be in Running state..."
+            sleep 20
+          done
+          if [ "$(kubectl get pod -l app=mysql -n mysql -o jsonpath='{.items[0].status.phase}')" != "Running" ]
+          then
+            echo "A pod associated with deployment mysql is now in Running state."
+          else
+            echo "The pod associated with deployment mysql can't start."
+            exit 1
+          fi
+
+          kubectl run -n mysql -it --rm --image=mysql:8 --restart=Never mysql-client -- mysql -hmysql -u${{ secrets.MYSQL_ROOT_USR }} -p${{ secrets.MYSQL_ROOT_PSW }} \
+          -e "
+          CREATE DATABASE IF NOT EXISTS devops_develop; GRANT ALL PRIVILEGES ON devops_develop.* TO 'elon'@'%';
+          CREATE DATABASE IF NOT EXISTS devops_qa; GRANT ALL PRIVILEGES ON devops_qa.* TO 'elon'@'%';
+          CREATE DATABASE IF NOT EXISTS devops_master; GRANT ALL PRIVILEGES ON devops_master.* TO 'elon'@'%';"
