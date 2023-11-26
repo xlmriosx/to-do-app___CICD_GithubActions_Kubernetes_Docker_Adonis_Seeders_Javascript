@@ -13,4 +13,4 @@ data:
   DB_CONNECTION: 'mysql'
   MYSQL_HOST: '149.50.132.241'
   MYSQL_PORT: '30306'
-  MYSQL_DB_NAME: 'devops-master'
+  MYSQL_DB_NAME: 'devops_master'
