@@ -4,7 +4,9 @@ import BaseSeeder from "@ioc:Adonis/Lucid/Seeder";
 
 export default class UserSeeder extends BaseSeeder {
   public async run() {
-    await Todo.updateOrCreateMany([
+    const users = await Todo.query();
+    if (users.length > 0) return;
+    await Todo.createMany([
       {
         title: "Finish migrations",
         desc: "add user and todo migrations",
