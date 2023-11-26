@@ -52,6 +52,16 @@ env:
   master_MYSQL_DB_NAME: devops_master
 
 jobs:
+  container:
+    runs-on: ubuntu-latest
+    container: nelsonyaccuzzi/flyway
+    steps:
+      - run: |
+          ls
+          echo This job does specify a container.
+          echo It runs in the container instead of the VM.
+        name: Run in container
+
   build-push-image:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
@@ -151,7 +161,7 @@ jobs:
         curl -X POST -H "Content-Type: application/json" \
         -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
         ${{ env.TEAMS_WEBHOOK_URL }}
-
+  
   seeder:
     runs-on: ubuntu-latest
     needs: [build-push-image,migration]
