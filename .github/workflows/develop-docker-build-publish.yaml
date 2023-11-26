@@ -174,7 +174,7 @@ jobs:
           -e "MYSQL_PASSWORD=${{ secrets.develop_MYSQL_PASSWORD }}" \
           -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
           ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
-          node ace migration:run
+          node ace db:seed
       - name: "Seeding database... 🦅"
         if: github.ref == 'refs/heads/qa'
         shell: bash
@@ -193,7 +193,7 @@ jobs:
           -e "MYSQL_PASSWORD=${{ secrets.qa_MYSQL_PASSWORD }}" \
           -e "MYSQL_DB_NAME=${{ env.qa_MYSQL_DB_NAME }}" \
           ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
-          node ace migration:run
+          node ace db:seed
       - name: "Seeding database... 🦅"
         if: github.ref == 'refs/heads/master'
         shell: bash
