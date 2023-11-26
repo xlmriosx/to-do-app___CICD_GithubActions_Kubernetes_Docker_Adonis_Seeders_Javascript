@@ -7,11 +7,11 @@ name: Docker-build-publish
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop", "qa", "master" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "develop", "qa", "master" ]
   workflow_dispatch:
     inputs:
       # Allow manual triggering of a workflow run.
@@ -35,17 +35,23 @@ env:
   develop_DRIVE_DISK: local
   develop_MYSQL_HOST: 149.50.132.241
   develop_MYSQL_PORT: 30306
-  develop_MYSQL_DB_NAME: devops
+  develop_MYSQL_DB_NAME: devops_develop
+  # Specific values
+  develop_PORT: 30306 
+  develop_NODE_ENV: qa
+  develop_DRIVE_DISK: local
+  develop_MYSQL_HOST: 149.50.132.241
+  develop_MYSQL_PORT: 30306
+  develop_MYSQL_DB_NAME: devops_qa
+  # Specific values
+  develop_PORT: 30306 
+  develop_NODE_ENV: master
+  develop_DRIVE_DISK: local
+  develop_MYSQL_HOST: 149.50.132.241
+  develop_MYSQL_PORT: 30306
+  develop_MYSQL_DB_NAME: devops_master
 
 jobs:
-  test:
-    runs-on: ubuntu-latest  
-    environment: qa
-    steps:
-      - name: Print Hello World
-        shell: bash
-        run: echo "esto es porque anda je"
-
   build-push-image:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
@@ -82,6 +88,7 @@ jobs:
     needs: [build-push-image]
     steps:
     - name: "Applying migrations with new image 🦅"
+      if: github.ref == 'refs/heads/develop'
       shell: bash
       run: |
         # Running new image
@@ -99,6 +106,44 @@ jobs:
         -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
         ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
         node ace migration:run
+    - name: "Applying migrations with new image 🦅"
+      if: github.ref == 'refs/heads/qa'
+      shell: bash
+      run: |
+        # Running new image
+        docker run --rm \
+        -e "HOST=${{ env.HOST }}" \
+        -e "PORT=${{ env.qa_PORT }}" \
+        -e "NODE_ENV=${{ env.qa_NODE_ENV }}" \
+        -e "APP_KEY=${{ secrets.qa_APP_KEY }}" \
+        -e "DRIVE_DISK=${{ env.qa_DRIVE_DISK }}" \
+        -e "DB_CONNECTION=${{ env.DB_CONNECTION }}" \
+        -e "MYSQL_HOST=${{ env.qa_MYSQL_HOST }}" \
+        -e "MYSQL_PORT=${{ env.qa_MYSQL_PORT }}" \
+        -e "MYSQL_USER=${{ secrets.qa_MYSQL_USER }}" \
+        -e "MYSQL_PASSWORD=${{ secrets.qa_MYSQL_PASSWORD }}" \
+        -e "MYSQL_DB_NAME=${{ env.qa_MYSQL_DB_NAME }}" \
+        ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
+        node ace migration:run
+    - name: "Applying migrations with new image 🦅"
+      if: github.ref == 'refs/heads/master'
+      shell: bash
+      run: |
+        # Running new image
+        docker run --rm \
+        -e "HOST=${{ env.HOST }}" \
+        -e "PORT=${{ env.master_PORT }}" \
+        -e "NODE_ENV=${{ env.master_NODE_ENV }}" \
+        -e "APP_KEY=${{ secrets.master_APP_KEY }}" \
+        -e "DRIVE_DISK=${{ env.master_DRIVE_DISK }}" \
+        -e "DB_CONNECTION=${{ env.DB_CONNECTION }}" \
+        -e "MYSQL_HOST=${{ env.master_MYSQL_HOST }}" \
+        -e "MYSQL_PORT=${{ env.master_MYSQL_PORT }}" \
+        -e "MYSQL_USER=${{ secrets.master_MYSQL_USER }}" \
+        -e "MYSQL_PASSWORD=${{ secrets.master_MYSQL_PASSWORD }}" \
+        -e "MYSQL_DB_NAME=${{ env.master_MYSQL_DB_NAME }}" \
+        ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
+        node ace migration:run
     
     - name: "Notify status of failure job"
       if: ${{ failure() }}
@@ -111,9 +156,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-push-image,migration]
     steps:
-
     - name: "Applying seeder with new image 🦅"
-      if: github.event_name == 'workflow_dispatch'
+      if: github.ref == 'refs/heads/develop'
       shell: bash
       run: |
         # Running new image
@@ -131,9 +175,45 @@ jobs:
         -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
         ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
         node ace db:seed
-      
-    
-    
+    - name: "Applying seeder with new image 🦅"
+      if: github.ref == 'refs/heads/qa'
+      shell: bash
+      run: |
+        # Running new image
+        docker run --rm \
+        -e "HOST=${{ env.HOST }}" \
+        -e "PORT=${{ env.qa_PORT }}" \
+        -e "NODE_ENV=${{ env.qa_NODE_ENV }}" \
+        -e "APP_KEY=${{ secrets.qa_APP_KEY }}" \
+        -e "DRIVE_DISK=${{ env.qa_DRIVE_DISK }}" \
+        -e "DB_CONNECTION=${{ env.DB_CONNECTION }}" \
+        -e "MYSQL_HOST=${{ env.qa_MYSQL_HOST }}" \
+        -e "MYSQL_PORT=${{ env.qa_MYSQL_PORT }}" \
+        -e "MYSQL_USER=${{ secrets.qa_MYSQL_USER }}" \
+        -e "MYSQL_PASSWORD=${{ secrets.qa_MYSQL_PASSWORD }}" \
+        -e "MYSQL_DB_NAME=${{ env.qa_MYSQL_DB_NAME }}" \
+        ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
+        node ace db:seed
+    - name: "Applying seeder with new image 🦅"
+      if: github.ref == 'refs/heads/master'
+      shell: bash
+      run: |
+        # Running new image
+        docker run --rm \
+        -e "HOST=${{ env.HOST }}" \
+        -e "PORT=${{ env.master_PORT }}" \
+        -e "NODE_ENV=${{ env.master_NODE_ENV }}" \
+        -e "APP_KEY=${{ secrets.master_APP_KEY }}" \
+        -e "DRIVE_DISK=${{ env.master_DRIVE_DISK }}" \
+        -e "DB_CONNECTION=${{ env.DB_CONNECTION }}" \
+        -e "MYSQL_HOST=${{ env.master_MYSQL_HOST }}" \
+        -e "MYSQL_PORT=${{ env.master_MYSQL_PORT }}" \
+        -e "MYSQL_USER=${{ secrets.master_MYSQL_USER }}" \
+        -e "MYSQL_PASSWORD=${{ secrets.master_MYSQL_PASSWORD }}" \
+        -e "MYSQL_DB_NAME=${{ env.master_MYSQL_DB_NAME }}" \
+        ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} \
+        node ace db:seed      
+   
     - name: "Notify status of failure job"
       if: ${{ failure() }}
       run: |
@@ -162,7 +242,7 @@ jobs:
           if [ ! -d "${{ github.event.repository.name }}" ]; then
             git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
           else
-            cd /home/twist/${{ github.event.repository.name }} && git pull
+            cd /home/twist/${{ github.event.repository.name }} && git fetch && git checkout ${{ steps.vars.outputs.branch }} && git pull
           fi
 
     # Conencting to srv and running helm commands to initialize or upgrade charts
@@ -175,11 +255,11 @@ jobs:
         port: ${{ secrets.SRV_PORT_TWISTORGAR }}
         script: |
           cd /home/twist/${{ github.event.repository.name }}/manifests/vars  && \
-          sudo kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops && \
-          sudo kubectl apply -f configmap-${{ steps.vars.outputs.branch }}.yaml -n devops
+          sudo kubectl apply -f secret-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }} && \
+          sudo kubectl apply -f configmap-${{ steps.vars.outputs.branch }}.yaml -n devops-${{ steps.vars.outputs.branch }}
 
           cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
-          sudo helm upgrade --install ${{ env.SERVICE }} . -n devops -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace
+          sudo helm upgrade --install ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace
 
     - name: "Notify status of failure job"
       if: ${{ failure() }}
