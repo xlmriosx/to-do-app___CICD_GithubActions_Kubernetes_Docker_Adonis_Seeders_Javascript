@@ -4,7 +4,7 @@ import BaseSeeder from "@ioc:Adonis/Lucid/Seeder";
 
 export default class UserSeeder extends BaseSeeder {
   public async run() {
-    await User.createMany([
+    await User.updateOrCreateMany([
       {
         email: "fede@adonisjs.com",
         password: "secret123",
