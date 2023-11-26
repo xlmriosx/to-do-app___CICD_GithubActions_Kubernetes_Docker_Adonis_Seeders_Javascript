@@ -56,66 +56,67 @@ jobs:
     runs-on: ubuntu-latest
     container: nelsonyaccuzzi/flyway
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Run in container
-        if: github.ref == 'refs/heads/develop'
-        run: |
-          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
-          flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
-          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}   
-
-      - name: Run in container
-        if: github.ref == 'refs/heads/qa'
-        run: |
-          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
-          flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
-          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }} 
-      
-      - name: Run in container
-        if: github.ref == 'refs/heads/master'
-        run: |
-          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.master_MYSQL_HOST }}:${{ env.master_MYSQL_PORT }}/${{ env.master_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
-          flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.master_MYSQL_HOST }}:${{ env.master_MYSQL_PORT }}/${{ env.master_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
-          flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.master_MYSQL_HOST }}:${{ env.master_MYSQL_PORT }}/${{ env.master_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }} 
-
-    - name: "Notify status of failure job"
-      if: ${{ failure() }}
+    - uses: actions/checkout@v3
+    
+    - name: Run in container
+      if: github.ref == 'refs/heads/develop'
       run: |
-        curl -X POST -H "Content-Type: application/json" \
-        -d '{"content": "Something in flyway of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
-        ${{ env.TEAMS_WEBHOOK_URL }}
+        flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+        flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+        flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.develop_MYSQL_HOST }}:${{ env.develop_MYSQL_PORT }}/${{ env.develop_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}   
+
+    - name: Run in container
+      if: github.ref == 'refs/heads/qa'
+      run: |
+        flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+        flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+        flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.qa_MYSQL_HOST }}:${{ env.qa_MYSQL_PORT }}/${{ env.qa_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }} 
+    
+    - name: Run in container
+      if: github.ref == 'refs/heads/master'
+      run: |
+        flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.master_MYSQL_HOST }}:${{ env.master_MYSQL_PORT }}/${{ env.master_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+        flyway migrate -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.master_MYSQL_HOST }}:${{ env.master_MYSQL_PORT }}/${{ env.master_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }}
+        flyway info -locations=filesystem:newsie/database/flyway -url="jdbc:mysql://${{ env.master_MYSQL_HOST }}:${{ env.master_MYSQL_PORT }}/${{ env.master_MYSQL_DB_NAME }}" -user=${{ secrets.MYSQL_ROOT_USR }} -password=${{ secrets.MYSQL_ROOT_PSW }} 
+
+  - name: "Notify status of failure job"
+    if: ${{ failure() }}
+    run: |
+      curl -X POST -H "Content-Type: application/json" \
+      -d '{"content": "Something in flyway of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+      ${{ env.TEAMS_WEBHOOK_URL }}
+  
   build-push-image:
     runs-on: ubuntu-latest
     needs: [flyway]
     if: github.ref == 'refs/heads/develop'
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: "Docker hub repository login 💠"
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      
-      - name: "Getting name of branch 🌿"
-        id: BRANCH
-        run: echo ::set-output name=BRANCH::${GITHUB_REF#refs/*/} # ${{ steps.branch.outputs.BRANCH }}
+    - name: "Docker hub repository login 💠"
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: "Getting name of branch 🌿"
+      id: BRANCH
+      run: echo ::set-output name=BRANCH::${GITHUB_REF#refs/*/} # ${{ steps.branch.outputs.BRANCH }}
 
-      - name: "Compose Customized Docker Image and push it 🐳"
-        shell: bash
-        run: |
-          # Building image with binaries 
-          cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} --no-cache 
-          # Pushing image to repository
-          docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
-      
-      - name: "Notify status of failure job"
-        if: ${{ failure() }}
-        run: |
-          curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
-          ${{ env.TEAMS_WEBHOOK_URL }}
+    - name: "Compose Customized Docker Image and push it 🐳"
+      shell: bash
+      run: |
+        # Building image with binaries 
+        cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} --no-cache 
+        # Pushing image to repository
+        docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
+    
+    - name: "Notify status of failure job"
+      if: ${{ failure() }}
+      run: |
+        curl -X POST -H "Content-Type: application/json" \
+        -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+        ${{ env.TEAMS_WEBHOOK_URL }}
       
   migration:
     runs-on: ubuntu-latest
