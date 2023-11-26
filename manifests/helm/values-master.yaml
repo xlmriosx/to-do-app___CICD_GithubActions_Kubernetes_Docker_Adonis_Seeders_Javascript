@@ -17,13 +17,13 @@ image:
 configValues:
   HOST: '0.0.0.0'
   PORT: '30306'
-  NODE_ENV: 'development'
+  NODE_ENV: 'master'
   DRIVE_DISK: 'local'
   SESSION_DRIVER: 'cookie'
   DB_CONNECTION: 'mysql'
   MYSQL_HOST: '149.50.132.241'
   MYSQL_PORT: '30306'
-  MYSQL_DB_NAME: 'devops_develop'
+  MYSQL_DB_NAME: 'devops_master'
 
 configs:
   - name: HOST
@@ -94,7 +94,7 @@ ingress:
   hosts:
     - host:
       paths:
-        - path: /devops-app-develop
+        - path: /devops-app
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
