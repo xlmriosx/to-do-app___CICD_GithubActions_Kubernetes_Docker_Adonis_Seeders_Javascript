@@ -68,11 +68,28 @@ jobs:
         id: BRANCH
         run: echo ::set-output name=BRANCH::${GITHUB_REF#refs/*/} # ${{ steps.branch.outputs.BRANCH }}
 
-      - name: "Compose Customized Docker Image and push it 🐳"
+      - name: "Compose Customized Docker Developm Image and push it 🐳"
+        if: github.ref == 'refs/heads/develop'
         shell: bash
         run: |
           # Building image with binaries 
-          cd newsie && docker build . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} --no-cache 
+          cd newsie && docker build --build-arg environment=${{ env.develop_NODE_ENV }} . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} --no-cache 
+          # Pushing image to repository
+          docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
+      - name: "Compose Customized Docker QA Image and push it 🐳"
+        if: github.ref == 'refs/heads/qa'
+        shell: bash
+        run: |
+          # Building image with binaries 
+          cd newsie && docker build --build-arg environment=${{ env.qa_NODE_ENV }} . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} --no-cache 
+          # Pushing image to repository
+          docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
+      - name: "Compose Customized Docker Production Image and push it 🐳"
+        if: github.ref == 'refs/heads/master'
+        shell: bash
+        run: |
+          # Building image with binaries 
+          cd newsie && docker build --build-arg environment=${{ env.master_NODE_ENV }} . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }} --no-cache 
           # Pushing image to repository
           docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ env.VERSION }}
 

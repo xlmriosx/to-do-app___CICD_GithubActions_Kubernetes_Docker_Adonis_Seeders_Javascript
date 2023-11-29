@@ -1,5 +1,6 @@
 ARG NODE_VERSION=18
 FROM node:${NODE_VERSION}-alpine as builder
+ARG environment=local
 
 # Create app directory
 RUN mkdir -p /usr/src/app
@@ -7,9 +8,8 @@ WORKDIR /usr/src/app
 
 # Installing dependencies
 COPY . /usr/src/app/
+COPY .env.${environment} .env
 RUN npm install
-
-#CMD ["npm", "run", "dev"]
 
 # -----------------------------------------------------------------------------------#
 
