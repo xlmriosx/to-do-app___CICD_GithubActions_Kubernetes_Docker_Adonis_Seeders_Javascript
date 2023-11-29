@@ -54,7 +54,7 @@ env:
 jobs:
   build-push-image:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/develop' || 'refs/heads/qa' || 'refs/heads/master'
     steps:
       - uses: actions/checkout@v3
 
