@@ -21,7 +21,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.get('/', async () => {
-  return { message: 'can you check this service v2 with postman' }
+  return { message: 'can you check this service with postman' }
 })
 
 Route.get('/health-check', async () => {
