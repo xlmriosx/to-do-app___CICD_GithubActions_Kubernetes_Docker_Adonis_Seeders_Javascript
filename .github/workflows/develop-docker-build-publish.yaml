@@ -284,7 +284,7 @@ jobs:
           port: ${{ secrets.SRV_PORT_TWISTORGAR }}
           script: |
             cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
-            sudo helm delete ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} --force && \
+            sudo helm delete ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} && \
             sudo helm upgrade --install ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace --force
 
             cd /home/twist/${{ github.event.repository.name }}/manifests/vars  && \
