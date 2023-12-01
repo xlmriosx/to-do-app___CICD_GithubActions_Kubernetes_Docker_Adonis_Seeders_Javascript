@@ -25,7 +25,7 @@ env:
   SERVER: docker.io
   USER: twistorgar
   IMAGE: devops-app
-  VERSION: "${{ github.event.head_commit.message }}"
+  VERSION: "${{ github.sha }}"
   SERVICE: devops-app
   HOST: 0.0.0.0
   DB_CONNECTION: mysql
@@ -73,15 +73,15 @@ jobs:
         shell: bash
         run: |
           # Building image with binaries 
-          cd newsie && docker build --build-arg environment=${{ env.develop_NODE_ENV }} . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} --no-cache 
+          cd newsie && docker build --build-arg environment=${{ env.develop_NODE_ENV }} . -t ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} --no-cache 
           # Pushing image to repository
-          docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }}
+          docker push ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }}
 
       - name: "Notify status of failure job"
         if: ${{ failure() }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Something in build or push of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🐳\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ env.TEAMS_WEBHOOK_URL }}
 
   schema-migration:
@@ -105,7 +105,7 @@ jobs:
           -e "MYSQL_USER=${{ secrets.develop_MYSQL_USER }}" \
           -e "MYSQL_PASSWORD=${{ secrets.develop_MYSQL_PASSWORD }}" \
           -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
-          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} \
+          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} \
           node ace migration:run
       - name: "Applying migrations with new image 🦅"
         if: github.ref == 'refs/heads/qa'
@@ -124,7 +124,7 @@ jobs:
           -e "MYSQL_USER=${{ secrets.qa_MYSQL_USER }}" \
           -e "MYSQL_PASSWORD=${{ secrets.qa_MYSQL_PASSWORD }}" \
           -e "MYSQL_DB_NAME=${{ env.qa_MYSQL_DB_NAME }}" \
-          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} \
+          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} \
           node ace migration:run
       - name: "Applying migrations with new image 🦅"
         if: github.ref == 'refs/heads/master'
@@ -143,14 +143,14 @@ jobs:
           -e "MYSQL_USER=${{ secrets.master_MYSQL_USER }}" \
           -e "MYSQL_PASSWORD=${{ secrets.master_MYSQL_PASSWORD }}" \
           -e "MYSQL_DB_NAME=${{ env.master_MYSQL_DB_NAME }}" \
-          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} \
+          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} \
           node ace migration:run
 
       - name: "Notify status of failure job"
         if: ${{ failure() }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ env.TEAMS_WEBHOOK_URL }}
 
   seed-database:
@@ -174,7 +174,7 @@ jobs:
           -e "MYSQL_USER=${{ secrets.develop_MYSQL_USER }}" \
           -e "MYSQL_PASSWORD=${{ secrets.develop_MYSQL_PASSWORD }}" \
           -e "MYSQL_DB_NAME=${{ env.develop_MYSQL_DB_NAME }}" \
-          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} \
+          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} \
           node ace db:seed
       - name: "Seeding database... 🦅"
         if: github.ref == 'refs/heads/qa'
@@ -193,7 +193,7 @@ jobs:
           -e "MYSQL_USER=${{ secrets.qa_MYSQL_USER }}" \
           -e "MYSQL_PASSWORD=${{ secrets.qa_MYSQL_PASSWORD }}" \
           -e "MYSQL_DB_NAME=${{ env.qa_MYSQL_DB_NAME }}" \
-          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} \
+          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} \
           node ace db:seed
       - name: "Seeding database... 🦅"
         if: github.ref == 'refs/heads/master'
@@ -212,14 +212,14 @@ jobs:
           -e "MYSQL_USER=${{ secrets.master_MYSQL_USER }}" \
           -e "MYSQL_PASSWORD=${{ secrets.master_MYSQL_PASSWORD }}" \
           -e "MYSQL_DB_NAME=${{ env.master_MYSQL_DB_NAME }}" \
-          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} \
+          ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} \
           node ace db:seed
 
       - name: "Notify status of failure job"
         if: ${{ failure() }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Something in migration of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🦅\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ env.TEAMS_WEBHOOK_URL }}
 
   # data-migration:
@@ -284,7 +284,7 @@ jobs:
           port: ${{ secrets.SRV_PORT_TWISTORGAR }}
           script: |
             cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
-            sed -i 's/tag: .*/tag: ${{ github.event.head_commit.message }}/' values-${{ steps.vars.outputs.branch }}.yaml
+            sed -i 's/tag: .*/tag: ${{ github.sha }}/' values-${{ steps.vars.outputs.branch }}.yaml
             sudo helm upgrade --install ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace --force
 
             cd /home/twist/${{ github.event.repository.name }}/manifests/vars  && \
@@ -295,7 +295,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Something in deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} was wrong! 🚀\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Something in deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was wrong! 🚀\nStatus: `${{ job.status }}` 💥👻 \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ env.TEAMS_WEBHOOK_URL }}
 
   notification:
@@ -308,5 +308,5 @@ jobs:
           TARGET_BRANCH: develop
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Build and deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.event.head_commit.message }} was succesfully! 🐳🚀\nStatus: `${{ job.status }}` 🍻✅ \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          -d '{"content": "Build and deploy in server of image 📸 ${{ env.SERVER }}/${{ env.USER }}/${{ env.IMAGE }}:${{ github.sha }} was succesfully! 🐳🚀\nStatus: `${{ job.status }}` 🍻✅ \nAutor: @${{ github.actor }} \nLink: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
           ${{ secrets.TEAMS_WEBHOOK_URL }}
