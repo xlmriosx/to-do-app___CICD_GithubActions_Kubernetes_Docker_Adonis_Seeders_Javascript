@@ -25,7 +25,7 @@ env:
   SERVER: docker.io
   USER: twistorgar
   IMAGE: devops-app
-  VERSION: 1.0.1
+  VERSION: "${{ github.event.head_commit.message }}"
   SERVICE: devops-app
   HOST: 0.0.0.0
   DB_CONNECTION: mysql
@@ -284,7 +284,7 @@ jobs:
           port: ${{ secrets.SRV_PORT_TWISTORGAR }}
           script: |
             cd /home/twist/${{ github.event.repository.name }}/manifests/helm && \
-            sudo helm delete ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} && \
+            sed -i 's/tag: .*/tag: ${{ env.VERSION }}/' values-${{ steps.vars.outputs.branch }}.yaml
             sudo helm upgrade --install ${{ env.SERVICE }} . -n devops-${{ steps.vars.outputs.branch }} -f values-${{ steps.vars.outputs.branch }}.yaml --create-namespace --force
 
             cd /home/twist/${{ github.event.repository.name }}/manifests/vars  && \
