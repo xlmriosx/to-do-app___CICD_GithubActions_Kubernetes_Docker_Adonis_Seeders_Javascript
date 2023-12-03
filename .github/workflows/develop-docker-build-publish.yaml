@@ -271,7 +271,7 @@ jobs:
             if [ ! -d "${{ github.event.repository.name }}" ]; then
               git clone -b ${{ steps.vars.outputs.branch }} https://${{ secrets.GIT_USER }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ github.repository }}.git
             else
-              cd /home/twist/${{ github.event.repository.name }} && git fetch && git checkout ${{ steps.vars.outputs.branch }} && git pull
+              cd /home/twist/${{ github.event.repository.name }} && git fetch && git checkout ${{ steps.vars.outputs.branch }} --force && git pull
             fi
 
       # Conencting to srv and running helm commands to initialize or upgrade charts
