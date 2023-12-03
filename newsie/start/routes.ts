@@ -40,4 +40,4 @@ Route.group(() => {
     Route.post("todos", "TodosController.store");
   }).middleware("auth:api");
       
-}).prefix("api");
+}).prefix("/api");
