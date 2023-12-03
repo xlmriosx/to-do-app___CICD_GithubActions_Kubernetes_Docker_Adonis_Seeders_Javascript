@@ -92,11 +92,9 @@ ingress:
     # kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
   hosts:
-    - host: develop.twist.com.ar # qa.twist.com.ar # twist.com.ar
+    - host:
       paths:
-        # - path: /devops-app-develop
-        #  pathType: Prefix
-        - path: /
+        - path: /devops-app-develop
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
