@@ -90,11 +90,12 @@ ingress:
   annotations: # {}
     kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
     - host:
       paths:
-        - path: /devops-app-develop
+        - path: /devops-app-develop(/|$)(.*)
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
